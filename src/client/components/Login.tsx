@@ -21,7 +21,7 @@ export default function Login() {
   const handleInputChange: ChangeEventHandler<HTMLInputElement> = (
     event: ChangeEvent<HTMLInputElement>
   ) => {
-    if (Boolean(error)) {
+    if (Boolean(error.trim())) {
       setError("");
     }
     setUsername(event.target.value);
@@ -29,8 +29,9 @@ export default function Login() {
 
   const handleFormSubmit: FormEventHandler = (event: FormEvent) => {
     event.preventDefault();
-    if (username === "") {
-      setError("Please enter a username");
+    if (!Boolean(username.trim())) {
+      setError("Username cannot be empty");
+      setUsername('');
       return;
     }
     login({
@@ -61,9 +62,9 @@ export default function Login() {
             type="text"
             value={username}
             aria-required={true}
-            placeholder={"Username"}
-            className={`w-56 border rounded-sm py-1.5 px-3 h-8 text-sm outline-none ring-offset-2 ${
-              error ? "border-red-500 focus:ring-red-500 focus:ring-2 placeholder:text-red-600" : "border-ps_neutral-100 focus:ring-2 focus:ring-ps_blue"
+            placeholder={error || "Username"}
+            className={`input ${
+              error ? "input-error" : ""
             }`}
             onChange={handleInputChange}
           />

@@ -1,61 +1,82 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { ReactElement } from "react";
+import { Link, useLocation, useNavigate, NavLink } from "react-router-dom";
+import useQuery from "../hooks/useQuery";
+import useModal from "../hooks/useModal";
 
 interface Props {
   username: string;
   logout: () => void;
+  sharePic: () => void;
 }
 
-export default function SessionNav({ username, logout }: Props) {
+export default function SessionNav({ username, logout, sharePic }: Props) {
   const navigate = useNavigate();
-  const location = useLocation();
-  const activePage = location.pathname.split("/").pop();
 
   const LogoutClickHandler = () => {
     logout();
-    navigate('/');
+    navigate("/");
   };
 
   return (
-    <nav className="flex flex-1 justify-between">
-      <ul className="grid grid-flow-col gap-7">
-        <li>
-          <Link
-            className={`relative py-6 ${
-              activePage === ""
-                ? "text-ps_blue after:absolute after:w-full after:h-0.5 after:bg-ps_blue after:bottom-0 after:left-0"
-                : ""
-            }`}
-            to="/"
+    <ResponsiveWrap>
+      <nav className="flex flex-col sm:flex-row flex-1 items-center justify-between gap-8">
+        <ul className="flex flex-col sm:grid sm:grid-flow-col gap-8 sm:gap-7 items-center justify-center">
+          <li>
+            <NavLink className="relative sm:py-6" to="/">
+              Home
+            </NavLink>
+          </li>
+          <li>
+            <NavLink className="relative sm:py-6" to="/favourites">
+              Favourites
+            </NavLink>
+          </li>
+        </ul>
+        <ul className="flex flex-col sm:grid sm:grid-flow-col gap-8 sm:gap-7 items-center justify-center">
+          <li>
+            <button className="btn-s" onClick={sharePic}>
+              Share Pic
+            </button>
+          </li>
+          <li className="hidden sm:block text-neutral-500">Hi {username}</li>
+          <li>
+            <button onClick={LogoutClickHandler} className="text-ps_blue">
+              Log out
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </ResponsiveWrap>
+  );
+}
+
+function ResponsiveWrap({ children }: { children: ReactElement }) {
+  const isLargeView = useQuery("(min-width: 640px)");
+  const { isOpen, getModalProps, closeModal, openModal } = useModal();
+
+  if (isLargeView) {
+    return children;
+  }
+
+  return (
+    <>
+      <button className="" onClick={openModal}>
+        Menu
+      </button>
+      {isOpen && (
+        <div
+          onClick={closeModal}
+          className="flex items-center justify-center fixed top-0 right-0 bottom-0 left-0 bg-[rgba(0,0,0,0.8)] z-10"
+        >
+          <div
+            {...getModalProps()}
+            onClick={closeModal}
+            className="flex items-center justify-center content-center relative w-screen max-w-xs h-1/2 bg-white p-4"
           >
-            Home
-          </Link>
-        </li>
-        <li>
-          <Link
-            className={`relative py-6 ${
-              activePage === "favourites"
-                ? "text-ps_blue after:absolute after:w-full after:h-0.5 after:bg-ps_blue after:bottom-0 after:left-0"
-                : ""
-            }`}
-            to="/favourites"
-          >
-            Favourites
-          </Link>
-        </li>
-      </ul>
-      <ul className="grid grid-flow-col gap-7">
-        <li>
-          <Link to="/upload" className="btn-s">
-            Share Pic
-          </Link>
-        </li>
-        <li className="text-neutral-500">Hi {username}</li>
-        <li>
-          <button onClick={LogoutClickHandler} className="text-ps_blue">
-            Log out
-          </button>
-        </li>
-      </ul>
-    </nav>
+            {children}
+          </div>
+        </div>
+      )}
+    </>
   );
 }

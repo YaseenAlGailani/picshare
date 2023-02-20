@@ -6,6 +6,22 @@
   @apply flex items-center rounded-sm text-sm text-white bg-ps_blue px-4 h-8
 }
 
+.btn-ps {
+  @apply flex items-center border border-ps_neutral-200 rounded-sm text-sm text-black px-4 h-8
+}
+
 .btn-s {
   @apply flex items-center rounded-sm text-sm text-white bg-ps_blue px-2 h-6
+}
+
+.active{
+  @apply text-ps_blue after:absolute after:w-full after:h-0.5 after:bg-ps_blue after:bottom-0 after:left-0
+}
+
+.input{
+  @apply w-56 border rounded-sm py-1.5 px-3 h-8 text-sm text-black outline-none ring-offset-2 border-ps_neutral-100 focus:ring-2 focus:ring-ps_blue
+}
+
+.input-error{
+  @apply border-red-500 focus:ring-red-500 placeholder:text-red-500
 }
