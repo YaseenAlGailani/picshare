@@ -4,6 +4,7 @@ import cors from "cors";
 import { Request, Response } from "express";
 import { picShareDB } from "./app-data-source";
 import picturesRoute from "./routes/pictures";
+import favouritesRoute from "./routes/favourites"
 
 const app = express();
 const PORT = 3000;
@@ -18,6 +19,7 @@ app.use(
 
 app.use(express.static(path.resolve("./dist")));
 app.use("/pictures", picturesRoute);
+app.use("/favourites", favouritesRoute);
 
 picShareDB
   .initialize()

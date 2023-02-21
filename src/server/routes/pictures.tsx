@@ -1,5 +1,6 @@
 import express from "express";
 import { Picture } from "../entities/picture.entity";
+import { Favourite } from "../entities/favourite.entity";
 
 const router = express.Router();
 
@@ -44,7 +45,33 @@ router.get("/", async (req, res) => {
     if (pictures.length === 0) {
       res.status(404).send({ message: "No pictures found" });
     }
-    res.status(200).send(pictures);
+    res.status(200).send({pictures});
+  } catch (error) {
+    res.status(500).send({ error });
+  }
+});
+
+router.get("/user/:username", async (req, res) => {
+  const { username } = req.params;
+  try {
+    const favouritesById = await Favourite.find({
+      where: {
+        username: username,
+      },
+      select: {
+        pictureId: true,
+      },
+    });
+
+    const pictures = await Picture.find({
+      order: {
+        date: "desc",
+      },
+    });
+    if (pictures.length === 0) {
+      res.status(404).send({ message: "No pictures found" });
+    }
+    res.status(200).send({ ids: favouritesById, pictures });
   } catch (error) {
     res.status(500).send({ error });
   }

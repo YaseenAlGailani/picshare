@@ -1,5 +1,6 @@
 import { DataSource } from "typeorm";
 import { Picture } from "./entities/picture.entity";
+import { Favourite } from "./entities/favourite.entity";
 
 export const picShareDB = new DataSource({
   type: "postgres",
@@ -8,7 +9,7 @@ export const picShareDB = new DataSource({
   username: "yaseen",
   password: "yaseen",
   database: "picshare",
-  entities: [Picture],
-  logging: true,
+  entities: [Picture, Favourite],
+  logging: false,
   synchronize: true,
 });

@@ -1,6 +1,7 @@
 import AddButton from "./AddButton";
 import { useSession } from "../context/SessionContext";
 import { MouseEvent, KeyboardEvent } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 interface Props {
   activated: (id: number) => void;
@@ -10,6 +11,9 @@ interface Props {
   date: string;
   username: string;
   added?: boolean;
+  isFavourite: boolean;
+  save:(id: number) => void;
+  remove:(id: number) => void;
 }
 
 export default function PictureCard({
@@ -20,8 +24,13 @@ export default function PictureCard({
   date,
   username,
   added = false,
+  isFavourite,
+  save,
+  remove
 }: Props) {
   const { session } = useSession();
+  const {pathname} = useLocation();
+  const navigate = useNavigate();
 
   const cardClickHandler = (event: MouseEvent<HTMLElement>) => {
     event.stopPropagation();
@@ -29,7 +38,11 @@ export default function PictureCard({
   };
 
   const cardKeyDownHandler = (event: KeyboardEvent<HTMLElement>) => {
-    if (event.code === "Space" || event.code === "Enter" || event.code === 'NumpadEnter') {
+    if (
+      event.code === "Space" ||
+      event.code === "Enter" ||
+      event.code === "NumpadEnter"
+    ) {
       event.stopPropagation();
       event.preventDefault();
       activated(id);
@@ -62,7 +75,9 @@ export default function PictureCard({
           <div className="">{username}</div>
           <time>{new Date(date).toLocaleDateString()}</time>
         </div>
-        {session.loggedIn && <AddButton initialAdded={added} />}
+        {session.loggedIn && (
+          <AddButton initialAdded={isFavourite} remove={()=>remove(id)} add={()=>save(id)} />
+        )}
       </div>
     </article>
   );

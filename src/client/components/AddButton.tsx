@@ -2,14 +2,21 @@ import { PointerEvent, useState, KeyboardEvent } from "react";
 
 interface Props {
   initialAdded?: boolean;
+  add: () => void;
+  remove: () => void;
 }
 
-export default function AddButton({ initialAdded = false }: Props) {
+export default function AddButton({
+  initialAdded = false,
+  add,
+  remove,
+}: Props) {
   const [added, setAdded] = useState(initialAdded);
 
   const handleButtonClick = (event: PointerEvent<HTMLButtonElement>) => {
     event.stopPropagation();
     setAdded(!added);
+    updateFavourite();
   };
 
   const handleButtonKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
@@ -21,7 +28,16 @@ export default function AddButton({ initialAdded = false }: Props) {
       event.stopPropagation();
       event.preventDefault();
       setAdded(!added);
+      updateFavourite();
     }
+  };
+
+  const updateFavourite = () => {
+    if (added) {
+      remove();
+      return;
+    }
+    add();
   };
 
   return (

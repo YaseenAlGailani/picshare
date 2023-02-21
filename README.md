@@ -17,6 +17,27 @@ npm install
 
 ---
 
+## Set up a local database
+
+This project requires a PostgreSQL database.
+
+- Create a database and update the details `app-data-source.ts` to match your configs.
+```JavaScript
+// app-data-source.ts
+
+export const picShareDB = new DataSource({
+  type: "postgres",
+  host: "localhost",
+  port: 5432,
+  username: "yaseen",
+  password: "yaseen",
+  database: "picshare",
+  entities: [Picture]
+});
+```
+
+---
+
 ## Running the app
 
 ### Run the dev version
