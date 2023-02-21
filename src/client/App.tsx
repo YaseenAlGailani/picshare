@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { Routes, Route } from "react-router-dom";
 import Home from "./components/Home";
 import Login from "./components/Login";
@@ -9,8 +10,12 @@ import useModal from "./hooks/useModal";
 import SharePictureModal from "./components/SharePictureModal";
 
 export function App() {
-
+  const keyRef = useRef(1);
   const { isOpen, openModal, ...modalProps } = useModal();
+
+  const updateHomeKey = () => {
+    keyRef.current = Math.floor(Math.random() * 10) + 1;
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-ps_neutral-50">
@@ -23,13 +28,15 @@ export function App() {
           <Route path="/favourites" element={<Favourites />}>
             <Route path="pictures/:id" element={<PictureModal />} />
           </Route>
-          <Route path="/" element={<Home shareModalOpen={isOpen as boolean} />}>
+          <Route path="/" element={<Home key={keyRef.current} />}>
             <Route path="pictures/:id" element={<PictureModal />} />
           </Route>
           <Route path="*" element={<PageNotFound />} />
         </Routes>
       </main>
-      {isOpen && <SharePictureModal {...modalProps} />}
+      {isOpen && (
+        <SharePictureModal refreshHome={updateHomeKey} {...modalProps} />
+      )}
     </div>
   );
 }

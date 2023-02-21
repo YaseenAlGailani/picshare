@@ -44,12 +44,7 @@ function reducer(state: State, action: Action) {
       throw new Error(`Unhandled action type`);
   }
 }
-
-interface Props {
-  shareModalOpen: boolean;
-}
-
-export default function Home({ shareModalOpen }: Props) {
+export default function Home() {
   const { session } = useSession();
 
   const [state, dispatch] = useReducer(reducer, {
@@ -79,8 +74,8 @@ export default function Home({ shareModalOpen }: Props) {
   };
 
   useEffect(() => {
-    !shareModalOpen && fetchPictures();
-  }, [shareModalOpen]);
+    fetchPictures();
+  }, []);
 
   if (state.status === "pending") {
     return <p>Loading...</p>;

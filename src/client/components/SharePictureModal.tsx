@@ -4,12 +4,14 @@ import { useSession } from "../context/SessionContext";
 import { useNavigate } from "react-router-dom";
 
 interface Props {
+  refreshHome: () => void;
   closeModal: () => void;
   getModalProps: any;
   labelId: string;
 }
 
 export default function SharePictureModal({
+  refreshHome,
   closeModal,
   getModalProps,
   labelId,
@@ -73,9 +75,9 @@ export default function SharePictureModal({
         body: JSON.stringify(data),
       });
 
-      navigate('/');
+      navigate("/");
+      refreshHome();
       closeModal();
-
     } catch (error) {
       console.error(error);
     }
