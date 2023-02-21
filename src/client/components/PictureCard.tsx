@@ -60,7 +60,7 @@ export default function PictureCard({
       >
         <div>
           <div className="">{username}</div>
-          <div>{date}</div>
+          <time>{new Date(date).toLocaleDateString()}</time>
         </div>
         {session.loggedIn && <AddButton initialAdded={added} />}
       </div>

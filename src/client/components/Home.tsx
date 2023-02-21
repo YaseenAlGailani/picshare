@@ -1,54 +1,98 @@
-import { useState } from "react";
+import { useEffect, useReducer } from "react";
 import { useSession } from "../context/SessionContext";
-import PicCard from "./PictureCard";
 import { Link } from "react-router-dom";
-import Picture from "./PictureModal";
 import PictureGrid from "./PictureGrid";
+import { IPicture } from "../types";
 
-export default function Home() {
+enum actionTypes {
+  error = "ERROR",
+  success = "SUCCESS",
+  fetching = "FETCHING",
+}
+
+interface State {
+  status: string;
+  error?: Error;
+  pictures?: IPicture[];
+}
+
+type Action =
+  | { type: actionTypes.error; error: Error }
+  | { type: actionTypes.success; pictures: IPicture[] }
+  | { type: actionTypes.fetching };
+
+function reducer(state: State, action: Action) {
+  switch (action.type) {
+    case actionTypes.error:
+      return {
+        ...state,
+        status: "rejected",
+        error: action.error,
+      };
+    case actionTypes.success:
+      return {
+        ...state,
+        status: "resolved",
+        pictures: action.pictures,
+      };
+    case actionTypes.fetching:
+      return {
+        ...state,
+        status: "pending",
+      };
+    default:
+      throw new Error(`Unhandled action type`);
+  }
+}
+
+interface Props {
+  shareModalOpen: boolean;
+}
+
+export default function Home({ shareModalOpen }: Props) {
   const { session } = useSession();
-  const [pictures, setPictures] = useState([
-    {
-      id: 1,
-      url: "https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=948&q=80",
-      title: "Plant 1",
-      username: "Yaseen",
-      date: "02/12/2023",
-      added: true,
-    },
-    {
-      id: 2,
-      url: "https://images.unsplash.com/photo-1459156212016-c812468e2115?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=810&q=80",
-      title: "Plant 2",
-      username: "Nala",
-      date: "15/10/2023",
-      added: false,
-    },
-    {
-      id: 3,
-      url: "https://images.unsplash.com/photo-1512428813834-c702c7702b78?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=774&q=80",
-      title: "Plant 3",
-      username: "Nirvana",
-      date: "01/09/2023",
-      added: false,
-    },
-    {
-      id: 4,
-      url: "https://images.unsplash.com/photo-1531875456634-3f5418280d20?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1587&q=80",
-      title: "Plant 4",
-      username: "Solomon",
-      date: "12/0/2023",
-      added: false,
-    },
-    {
-      id: 5,
-      url: "https://images.unsplash.com/photo-1508013861974-9f6347163ebe?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1752&q=80",
-      title: "Plant 5",
-      username: "Nala",
-      date: "02/03/2023",
-      added: false,
-    },
-  ]);
+
+  const [state, dispatch] = useReducer(reducer, {
+    status: "pending",
+  });
+
+  const fetchPictures = async () => {
+    dispatch({ type: actionTypes.fetching });
+    try {
+      const response = await fetch("http://localhost:3000/pictures/");
+
+      if (!response.ok) {
+        switch (response.status) {
+          case 400:
+            throw new Error("Bad request");
+          case 404:
+            throw new Error("Not found");
+          default:
+            throw new Error("Unhandled error status");
+        }
+      }
+      const pictures = await response.json();
+      dispatch({ type: actionTypes.success, pictures });
+    } catch (error: any) {
+      dispatch({ type: actionTypes.error, error });
+    }
+  };
+
+  useEffect(() => {
+    !shareModalOpen && fetchPictures();
+  }, [shareModalOpen]);
+
+  if (state.status === "pending") {
+    return <p>Loading...</p>;
+  }
+
+  if (state.status === "rejected") {
+    return (
+      <div>
+        <p>Failed to load pictures!</p>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -62,7 +106,7 @@ export default function Home() {
           </p>
         </div>
       )}
-      <PictureGrid pictures={pictures} />
+      <PictureGrid pictures={state.pictures as IPicture[]} />
     </>
   );
 }

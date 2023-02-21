@@ -1,5 +1,7 @@
 import { ChangeEvent, useState, FormEvent, FormEventHandler } from "react";
 import CloseButton from "./CloseButton";
+import { useSession } from "../context/SessionContext";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
   closeModal: () => void;
@@ -16,6 +18,9 @@ export default function SharePictureModal({
   const [urlError, setUrlError] = useState("");
   const [title, setTitle] = useState("");
   const [titleError, setTitleError] = useState("");
+
+  const { session } = useSession();
+  const navigate = useNavigate();
 
   const handleURLChange = (event: ChangeEvent<HTMLInputElement>) => {
     setUrl(event.target.value);
@@ -41,16 +46,39 @@ export default function SharePictureModal({
 
     if (!Boolean(title.trim())) {
       setTitleError("Title cannot be empty");
+      setTitle("");
       isValid = isValid && false;
     }
 
     return isValid;
   };
 
-  const handleFormSubmit: FormEventHandler = (event: FormEvent) => {
+  const handleFormSubmit: FormEventHandler = async (event: FormEvent) => {
     event.preventDefault();
     if (!validate()) return;
-    console.log("submitting form");
+
+    const data = {
+      url,
+      username: session.username,
+      title,
+      date: new Date(),
+    };
+
+    try {
+      await fetch("http://localhost:3000/pictures", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      navigate('/');
+      closeModal();
+
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (

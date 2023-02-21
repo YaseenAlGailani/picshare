@@ -1,26 +1,84 @@
-import { useEffect, useState } from "react";
+import { useEffect, useReducer } from "react";
 import { useParams } from "react-router-dom";
 import type { IPicture } from "../types";
 import useModal from "../hooks/useModal";
 import { useNavigate } from "react-router-dom";
 import CloseButton from "./CloseButton";
 
+enum actionTypes {
+  error = "ERROR",
+  success = "SUCCESS",
+  fetching = "FETCHING",
+}
+
+interface State {
+  status: string;
+  error?: Error;
+  picture?: IPicture;
+}
+
+type Action =
+  | { type: actionTypes.error; error: Error }
+  | { type: actionTypes.success; picture: IPicture }
+  | { type: actionTypes.fetching };
+
+function reducer(state: State, action: Action) {
+  switch (action.type) {
+    case actionTypes.error:
+      return {
+        ...state,
+        status: "rejected",
+        error: action.error,
+      };
+    case actionTypes.success:
+      return {
+        ...state,
+        status: "resolved",
+        picture: action.picture,
+      };
+    case actionTypes.fetching:
+      return {
+        ...state,
+        status: "pending",
+      };
+    default:
+      throw new Error(`Unhandled action type`);
+  }
+}
+
 export default function PictureModal() {
-  const [picture, setPicture] = useState<IPicture | null>(null);
+  const [state, dispatch] = useReducer(reducer, {
+    status: "pending",
+  });
+
   const { id } = useParams();
   const { getModalProps, labelId } = useModal({ initialIsOpen: true });
   const navigate = useNavigate();
 
+  const fetchPicture = async () => {
+    dispatch({ type: actionTypes.fetching });
+    try {
+      const response = await fetch(`http://localhost:3000/pictures/${id}`);
+
+      if (!response.ok) {
+        switch (response.status) {
+          case 400:
+            throw new Error("Bad request");
+          case 404:
+            throw new Error("Not found");
+          default:
+            throw new Error("Unhandled error status");
+        }
+      }
+      const picture = await response.json();
+      dispatch({ type: actionTypes.success, picture });
+    } catch (error: any) {
+      dispatch({ type: actionTypes.error, error });
+    }
+  };
+
   useEffect(() => {
-    //fetch picture using id
-    setPicture({
-      id: 1,
-      url: "https://images.unsplash.com/photo-1459156212016-c812468e2115?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=810&q=80",
-      title: "Best plant of the day",
-      date: "12/03/2023",
-      username: "yaseen",
-      added: false,
-    });
+    fetchPicture();
   }, []);
 
   const closeModal = () => {
@@ -40,19 +98,19 @@ export default function PictureModal() {
           clicked={closeModal}
           className="w-7 h-7 absolute right-2 "
         />
-        {picture && (
+        {state.picture && (
           <>
             <header className="flex items-center pb-2">
               <h2 id={labelId} className="mr-14">
-                {picture.username}
+                {state.picture.username}
               </h2>
-              <time className="text-sm">{picture.date}</time>
+              <time className="text-sm">{new Date(state.picture.date).toLocaleDateString()}</time>
             </header>
             <div className="h-[90vh] max-h-[1000px]">
               <div className="h-full w-full">
                 <img
                   className="object-contain w-full h-full"
-                  src={picture.url}
+                  src={state.picture.url}
                   alt=""
                 />
               </div>
