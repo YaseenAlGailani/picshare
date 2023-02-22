@@ -1,37 +1,42 @@
 import { useNavigate, Outlet, useLocation } from "react-router-dom";
 import PictureCard from "./PictureCard";
-import { IPicture } from "../types";
 import { useSession } from "../context/SessionContext";
-import { useRef } from "react";
+import usePictureFetcher from "../hooks/usePicturesFetcher";
+import { useEffect, useState } from "react";
 
 interface Props {
-  data: { ids: number[]; pictures: IPicture[] };
-  refetch?:()=>void;
+  url: string;
 }
 
-export default function PictureGrid({ data, refetch }: Props) {
+export default function PictureGrid({ url }: Props) {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { session } = useSession();
+
+  const {
+    status,
+    pictures,
+    favouriteIds,
+    fetchAll,
+    fetchPictures,
+    fetchNextPictures,
+    scrollHandler,
+    isLazyLoading,
+  } = usePictureFetcher(url);
+
   const viewPicture = (id: number) => {
     navigate(`pictures/${id}`);
   };
 
-  const justIds: number[] = data.ids?.reduce((array: number[], obj: any) => {
-    array.push(obj["pictureId"]);
-    return array;
-  }, []);
-
-  const isFavourite = (id: number) => {
-    return justIds?.includes(id);
+  const checkFavourite = (id: number) => {
+    return favouriteIds?.includes(id) || false;
   };
 
-  const save = async (id: number) => {
+  const addToFavourites = async (id: number) => {
     const data = {
       id,
       username: session.username,
     };
-
     try {
       await fetch("http://localhost:3000/favourites", {
         method: "POST",
@@ -45,7 +50,7 @@ export default function PictureGrid({ data, refetch }: Props) {
     }
   };
 
-  const remove = async (id: number) => {
+  const removeFromFavourites = async (id: number) => {
     const url = `http://localhost:3000/favourites/${session.username}/${id}`;
     try {
       await fetch(url, {
@@ -54,29 +59,55 @@ export default function PictureGrid({ data, refetch }: Props) {
     } catch (error) {
       console.error(error);
     }
-
     if (pathname.split("/").pop() === "favourites") {
-      navigate("/favourites");
-      refetch && refetch();
+      fetchAll();
     }
   };
 
-  if(data.pictures.length <=0){
-    return <div className="bg-ps_neutral-100 rounded-xl p-4 text-center">
-      <p>There are no pictures yet!</p>
-    </div>
+  useEffect(() => {
+    session.loggedIn ? fetchAll() : fetchPictures();
+    window.addEventListener("scroll", scrollHandler);
+
+    return () => {
+      window.removeEventListener("scroll", scrollHandler);
+    };
+  }, []);
+
+  useEffect(() => {
+    if(!isLazyLoading) return
+    fetchNextPictures();
+  }, [isLazyLoading]);
+
+  if (status === "pending") {
+    return <p>Loading...</p>;
+  }
+
+  if (status === "rejected") {
+    return (
+      <div>
+        <p>Failed to load pictures!</p>
+      </div>
+    );
+  }
+
+  if (!Boolean(pictures?.length)) {
+    return (
+      <div className="bg-ps_neutral-100 rounded-xl p-4 text-center">
+        <p>There are no pictures yet!</p>
+      </div>
+    );
   }
 
   return (
     <>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-3 md:grid-cols-3 lg:grid-cols-4 gap-5">
-        {data.pictures!.map((picture) => (
+        {pictures?.map((picture) => (
           <PictureCard
             key={picture.id}
             activated={viewPicture}
-            isFavourite={isFavourite(picture.id)}
-            save={save}
-            remove={remove}
+            isFavourite={checkFavourite(picture.id)}
+            addToFavourites={addToFavourites}
+            removeFromFavourites={removeFromFavourites}
             {...picture}
           />
         ))}

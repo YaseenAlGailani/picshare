@@ -1,4 +1,5 @@
 import express from "express";
+import { In, LessThan, And } from "typeorm";
 import { Favourite } from "../entities/favourite.entity";
 import { Picture } from "../entities/picture.entity";
 
@@ -14,6 +15,7 @@ router.post("/", async (req, res) => {
     res.status(200).send({ message: "Added picture to favourites!" });
   } catch (error) {
     console.log(error);
+    res.status(500).send("Server error");
   }
 });
 
@@ -24,6 +26,7 @@ router.delete("/:username/:id", async (req, res) => {
     res.status(204).send({ message: "Removed picture from favourites!" });
   } catch (error) {
     console.log(error);
+    res.status(500).send("Server error");
   }
 });
 
@@ -40,42 +43,49 @@ router.get("/ids/:username", async (req, res) => {
     });
 
     if (favouritesById.length === 0) {
-      res.status(404).send({ message: "No records found" });
+      res.status(200).send({});
+      return;
     }
     res.status(200).send(favouritesById);
   } catch (error) {
-    res.status(500).send({ error });
+    console.log(error);
+    res.status(500).send("Server error");
   }
 });
 
 router.get("/pictures/:username", async (req, res) => {
-  const { username } = req.params;
   try {
-    const favouritesById = await Favourite.find({
+    const { username } = req.params;
+    const intialAfter = await Favourite.find({
+      order: { id: "desc" },
+      take: 1,
+    });
+    if (intialAfter.length <= 0) {
+      res.status(200).send({});
+      return;
+    }
+    const limit = parseInt(req.query.limit as string) || 12;
+    const after = parseInt(req.query.after as string) || intialAfter[0].id + 1;
+
+    const [favouriteIds, count] = await Favourite.findAndCount({
+      where: { username: username, id: LessThan(after) },
+      select: { pictureId: true, id:true },
+      order: { id: "desc" },
+      take: limit,
+    });
+
+    const hasNext = count > limit;
+    const lastId = favouriteIds[favouriteIds.length - 1]?.id || null;
+    const pageInfo = { hasNext, lastId };
+    const pictures = await Picture.find({
       where: {
-        username: username,
-      },
-      select: {
-        pictureId: true,
+        id: In(favouriteIds.map((f) => f.pictureId)),
       },
     });
-    if (favouritesById.length===0) {
-      res.status(200).send({ids:[], pictures:[]});
-      return 
-    }
-    const pictures = await Picture.createQueryBuilder("picture")
-      .where("picture.id IN (:...ids)", {
-        ids: favouritesById.map((f) => f.pictureId),
-      })
-      .orderBy({ Date: "DESC" })
-      .getMany();
-
-    if (pictures.length === 0) {
-      res.status(404).send({ message: "No records found" });
-    }
-    res.status(200).send({ ids: favouritesById, pictures });
+    res.status(200).json({ pictures, pageInfo });
   } catch (error) {
-    res.status(500).send({ error });
+    console.log(error);
+    res.status(500).send("Server error");
   }
 });
 

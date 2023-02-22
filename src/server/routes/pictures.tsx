@@ -1,4 +1,5 @@
 import express from "express";
+import { LessThan } from "typeorm";
 import { Picture } from "../entities/picture.entity";
 import { Favourite } from "../entities/favourite.entity";
 
@@ -19,6 +20,7 @@ router.post("/", async (req, res) => {
     res.status(200).send({ message: "Your picture was successfully shared!" });
   } catch (error) {
     console.log(error);
+    res.status(500).send("Server error");
   }
 });
 
@@ -31,49 +33,37 @@ router.get("/:id", async (req, res) => {
     }
     res.status(200).send(picture);
   } catch (error) {
-    res.status(500).send({ error });
+    console.log(error);
+    res.status(500).send("Server error");
   }
 });
 
 router.get("/", async (req, res) => {
   try {
-    const pictures = await Picture.find({
-      order: {
-        date: "desc",
-      },
+    const intialAfter = await Picture.find({
+      order: { id: "desc" },
+      take:1
     });
-    if (pictures.length === 0) {
-      res.status(404).send({ message: "No pictures found" });
+    if (intialAfter.length <= 0) {
+       res.status(200).send({});
+      return
     }
-    res.status(200).send({pictures});
-  } catch (error) {
-    res.status(500).send({ error });
-  }
-});
+    const limit = parseInt(req.query.limit as string) || 12;
+    const after = parseInt(req.query.after as string) || intialAfter[0].id +1;
 
-router.get("/user/:username", async (req, res) => {
-  const { username } = req.params;
-  try {
-    const favouritesById = await Favourite.find({
-      where: {
-        username: username,
-      },
-      select: {
-        pictureId: true,
-      },
+    const [pictures, count] = await Picture.findAndCount({
+      where: { id: LessThan(after) },
+      take: limit,
+      order: { id: "desc" },
     });
+    const hasNext = count > limit;
+    const lastId = pictures[pictures.length - 1]?.id || null;
 
-    const pictures = await Picture.find({
-      order: {
-        date: "desc",
-      },
-    });
-    if (pictures.length === 0) {
-      res.status(404).send({ message: "No pictures found" });
-    }
-    res.status(200).send({ ids: favouritesById, pictures });
+    const pageInfo = { hasNext, lastId };
+    res.status(200).json({ pictures, pageInfo });
   } catch (error) {
-    res.status(500).send({ error });
+    console.error(error);
+    res.status(500).send("Server error");
   }
 });
 

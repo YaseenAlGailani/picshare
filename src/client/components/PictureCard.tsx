@@ -12,8 +12,8 @@ interface Props {
   username: string;
   added?: boolean;
   isFavourite: boolean;
-  save:(id: number) => void;
-  remove:(id: number) => void;
+  addToFavourites: (id: number) => void;
+  removeFromFavourites: (id: number) => void;
 }
 
 export default function PictureCard({
@@ -25,11 +25,11 @@ export default function PictureCard({
   username,
   added = false,
   isFavourite,
-  save,
-  remove
+  addToFavourites,
+  removeFromFavourites,
 }: Props) {
   const { session } = useSession();
-  const {pathname} = useLocation();
+  const { pathname } = useLocation();
   const navigate = useNavigate();
 
   const cardClickHandler = (event: MouseEvent<HTMLElement>) => {
@@ -76,7 +76,11 @@ export default function PictureCard({
           <time>{new Date(date).toLocaleDateString()}</time>
         </div>
         {session.loggedIn && (
-          <AddButton initialAdded={isFavourite} remove={()=>remove(id)} add={()=>save(id)} />
+          <AddButton
+            initialAdded={isFavourite}
+            remove={() => removeFromFavourites(id)}
+            add={() => addToFavourites(id)}
+          />
         )}
       </div>
     </article>
