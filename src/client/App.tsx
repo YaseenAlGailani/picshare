@@ -28,14 +28,14 @@ export function App() {
           <Route path="/favourites" element={<Favourites />}>
             <Route path="pictures/:id" element={<PictureModal />} />
           </Route>
-          <Route path="/" element={<Home key={keyRef.current} />}>
+          <Route path="/" element={<Home gridKey={keyRef.current} />}>
             <Route path="pictures/:id" element={<PictureModal />} />
           </Route>
           <Route path="*" element={<PageNotFound />} />
         </Routes>
       </main>
       {isOpen && (
-        <SharePictureModal refreshHome={updateHomeKey} {...modalProps} />
+        <SharePictureModal refreshGrid={updateHomeKey} {...modalProps} />
       )}
     </div>
   );

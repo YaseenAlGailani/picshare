@@ -1,4 +1,4 @@
-import { useRef, useReducer, useEffect, useState } from "react";
+import { useRef, useReducer, useState } from "react";
 import { useSession } from "../context/SessionContext";
 import type { IPicture } from "../types";
 
