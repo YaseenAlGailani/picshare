@@ -61,7 +61,7 @@ router.get("/pictures/:username", async (req, res) => {
       take: 1,
     });
     if (intialAfter.length <= 0) {
-      res.status(200).send({});
+      res.status(200).send({ pictures: [], pageInfo: {} });
       return;
     }
     const limit = parseInt(req.query.limit as string) || 12;
