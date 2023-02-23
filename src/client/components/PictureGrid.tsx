@@ -2,7 +2,7 @@ import { useNavigate, Outlet, useLocation } from "react-router-dom";
 import PictureCard from "./PictureCard";
 import { useSession } from "../context/SessionContext";
 import usePictureFetcher from "../hooks/usePicturesFetcher";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 interface Props {
   url: string;
@@ -51,7 +51,7 @@ export default function PictureGrid({ url }: Props) {
   };
 
   const removeFromFavourites = async (id: number) => {
-    const url = `http://localhost:3000/favourites/${session.username}/${id}`;
+    const url = `http://localhost:3000/favourites/${id}/${session.username}`;
     try {
       await fetch(url, {
         method: "DELETE",
@@ -74,7 +74,7 @@ export default function PictureGrid({ url }: Props) {
   }, []);
 
   useEffect(() => {
-    if(!isLazyLoading) return
+    if (!isLazyLoading) return;
     fetchNextPictures();
   }, [isLazyLoading]);
 

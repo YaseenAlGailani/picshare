@@ -1,5 +1,5 @@
 import express from "express";
-import { In, LessThan, And } from "typeorm";
+import { In, LessThan } from "typeorm";
 import { Favourite } from "../entities/favourite.entity";
 import { Picture } from "../entities/picture.entity";
 
@@ -19,7 +19,7 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.delete("/:username/:id", async (req, res) => {
+router.delete("/:id/:username", async (req, res) => {
   try {
     const id = parseInt(req.params.id);
     await Favourite.delete({ pictureId: id, username: req.params.username });
@@ -56,19 +56,11 @@ router.get("/ids/:username", async (req, res) => {
 router.get("/pictures/:username", async (req, res) => {
   try {
     const { username } = req.params;
-    const intialAfter = await Favourite.find({
-      order: { id: "desc" },
-      take: 1,
-    });
-    if (intialAfter.length <= 0) {
-      res.status(200).send({ pictures: [], pageInfo: {} });
-      return;
-    }
     const limit = parseInt(req.query.limit as string) || 12;
-    const after = parseInt(req.query.after as string) || intialAfter[0].id + 1;
+    const after = parseInt(req.query.after as string) || null;
 
     const [favouriteIds, count] = await Favourite.findAndCount({
-      where: { username: username, id: LessThan(after) },
+      where: { username: username, ...(after && {id: LessThan(after)}) },
       select: { pictureId: true, id:true },
       order: { id: "desc" },
       take: limit,
