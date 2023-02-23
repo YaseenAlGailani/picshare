@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useSession } from "../context/SessionContext";
 import { useNavigate } from "react-router-dom";
 import PictureGrid from "./PictureGrid";

@@ -1,4 +1,4 @@
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Outlet } from "react-router-dom";
 import PictureCard from "./PictureCard";
 import { useSession } from "../context/SessionContext";
 import usePictureFetcher from "../hooks/usePicturesFetcher";
@@ -113,6 +113,7 @@ export default function PictureGrid({ url }: Props) {
           />
         ))}
       </div>
+      <Outlet />
       {hasNext && <div className="flex justify-center">
         <button onClick={fetchNextPictures} className="btn-ps">Load more</button>
       </div>}
