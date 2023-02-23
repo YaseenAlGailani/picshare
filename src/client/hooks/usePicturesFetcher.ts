@@ -197,6 +197,7 @@ export default function usePictureFetcher(baseUrl: string) {
     fetchNextPictures,
     scrollHandler,
     isLazyLoading,
+    hasNext: hasNextRef.current
   };
 }
 

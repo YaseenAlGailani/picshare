@@ -22,7 +22,7 @@ export function App() {
       <header className="flex items-center h-16 mb-8 px-2 md:px-4 lg:px-10 bg-white shadow-ps">
         <Header openShareModal={openModal} />
       </header>
-      <main className="flex flex-1 flex-col mx-auto w-full max-w-ps px-2 md:px-4 lg:px-6">
+      <main className="flex flex-1 flex-col mx-auto w-full max-w-ps px-2 md:px-4 lg:px-6 mb-8">
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/favourites" element={<Favourites />}>

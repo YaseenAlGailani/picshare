@@ -1,4 +1,4 @@
-import { useNavigate, Outlet, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import PictureCard from "./PictureCard";
 import { useSession } from "../context/SessionContext";
 import usePictureFetcher from "../hooks/usePicturesFetcher";
@@ -22,6 +22,7 @@ export default function PictureGrid({ url }: Props) {
     fetchNextPictures,
     scrollHandler,
     isLazyLoading,
+    hasNext
   } = usePictureFetcher(url);
 
   const viewPicture = (id: number) => {
@@ -100,7 +101,7 @@ export default function PictureGrid({ url }: Props) {
 
   return (
     <>
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-3 md:grid-cols-3 lg:grid-cols-4 gap-5">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-3 md:grid-cols-3 lg:grid-cols-4 gap-5 mb-8">
         {pictures?.map((picture) => (
           <PictureCard
             key={picture.id}
@@ -112,7 +113,9 @@ export default function PictureGrid({ url }: Props) {
           />
         ))}
       </div>
-      <Outlet />
+      {hasNext && <div className="flex justify-center">
+        <button onClick={fetchNextPictures} className="btn-ps">Load more</button>
+      </div>}
     </>
   );
 }
