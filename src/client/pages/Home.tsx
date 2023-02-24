@@ -1,6 +1,6 @@
 import { useSession } from "../context/SessionContext";
 import { Link } from "react-router-dom";
-import PictureGrid from "./PictureGrid";
+import PictureGrid from "../components/PictureGrid";
 
 export default function Home({ gridKey }: { gridKey:number }) {
   const { session } = useSession();

@@ -7,7 +7,7 @@ import {
   useRef,
   useState,
 } from "react";
-import Logo from "./Logo";
+import Logo from "../components/Logo";
 import { useSession } from "../context/SessionContext";
 import { useNavigate } from "react-router-dom";
 
