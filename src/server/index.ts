@@ -17,9 +17,12 @@ app.use(
   })
 );
 
-app.use(express.static(path.resolve("./dist")));
-app.use("/pictures", picturesRoute);
-app.use("/favourites", favouritesRoute);
+app.use("/api/pictures", picturesRoute);
+app.use("/api/favourites", favouritesRoute);
+app.use(express.static(path.resolve("dist")));
+app.get("*", (req: Request, res: Response) => {
+  res.sendFile(path.resolve("./dist/index.html"));
+});
 
 picShareDB
   .initialize()
@@ -29,9 +32,5 @@ picShareDB
   .catch((err) => {
     console.error("Error during Data Source initialization:", err);
   });
-
-app.get("/", (req: Request, res: Response) => {
-  res.sendFile(path.resolve("./dist/index.html"));
-});
 
 app.listen(PORT);

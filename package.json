@@ -4,9 +4,9 @@
   "description": "CoTreat Assessment",
   "source": "src/client/index.html",
   "scripts": {
-    "prestart": "rimraf dist && npm run build",
+    "prestart": "npm run build",
     "start": "node dist/server/index.js",
-    "build": "parcel build && npx tsc",
+    "build": "rimraf dist && parcel build && npx tsc",
     "predev": "rimraf dist && npx tsc",
     "dev": "concurrently \"npx tsc -w\" \"nodemon ./dist/server/index.js\" \"parcel\""
   },

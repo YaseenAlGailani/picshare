@@ -48,7 +48,7 @@ If you would like to run the dev server, you can run the below.
 npm run dev
 ```
 
-Then navigate to [localhost:1234](http://localhost:3000) from your browser.
+Then navigate to [localhost:3000](http://localhost:3000) from your browser.
 
 This runs both servers; the Express server and the Parcel dev server.
 

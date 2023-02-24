@@ -16,7 +16,7 @@ export const fetcher = async (
       ...(body && { body: JSON.stringify(body) }),
     };
 
-    const response = await fetch(`${API_ROOT}${url}`, options);
+    const response = await fetch(`${API_ROOT}/api${url}`, options);
     const data = await response.json();
     return data;
   } catch (error) {
