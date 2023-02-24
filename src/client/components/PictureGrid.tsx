@@ -3,12 +3,13 @@ import PictureCard from "./PictureCard";
 import { useSession } from "../context/SessionContext";
 import usePictureFetcher from "../hooks/usePicturesFetcher";
 import { useEffect } from "react";
+import { fetcher } from "../utils";
 
 interface Props {
-  url: string;
+  path: string;
 }
 
-export default function PictureGrid({ url }: Props) {
+export default function PictureGrid({ path }: Props) {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { session } = useSession();
@@ -22,8 +23,8 @@ export default function PictureGrid({ url }: Props) {
     fetchNextPictures,
     scrollHandler,
     isLazyLoading,
-    hasNext
-  } = usePictureFetcher(url);
+    hasNext,
+  } = usePictureFetcher(path);
 
   const viewPicture = (id: number) => {
     navigate(`pictures/${id}`);
@@ -38,28 +39,12 @@ export default function PictureGrid({ url }: Props) {
       id,
       username: session.username,
     };
-    try {
-      await fetch("http://localhost:3000/favourites", {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-    } catch (error) {
-      console.error(error);
-    }
+    await fetcher("/favourites", "POST", data);
   };
 
   const removeFromFavourites = async (id: number) => {
-    const url = `http://localhost:3000/favourites/${id}/${session.username}`;
-    try {
-      await fetch(url, {
-        method: "DELETE",
-      });
-    } catch (error) {
-      console.error(error);
-    }
+    await fetcher(`/favourites/${id}/${session.username}`, "DELETE");
+
     if (pathname.split("/").pop() === "favourites") {
       fetchAll();
     }
@@ -114,9 +99,13 @@ export default function PictureGrid({ url }: Props) {
         ))}
       </div>
       <Outlet />
-      {hasNext && <div className="flex justify-center">
-        <button onClick={fetchNextPictures} className="btn-ps">Load more</button>
-      </div>}
+      {hasNext && (
+        <div className="flex justify-center">
+          <button onClick={fetchNextPictures} className="btn-ps">
+            Load more
+          </button>
+        </div>
+      )}
     </>
   );
 }

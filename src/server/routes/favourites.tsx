@@ -12,7 +12,7 @@ router.post("/", async (req, res) => {
     favourite.username = username;
     favourite.pictureId = id;
     await favourite.save();
-    res.status(200).send({ message: "Added picture to favourites!" });
+    res.status(200).json({ message: "Added picture to favourites!" });
   } catch (error) {
     console.log(error);
     res.status(500).send("Server error");
@@ -23,7 +23,7 @@ router.delete("/:id/:username", async (req, res) => {
   try {
     const id = parseInt(req.params.id);
     await Favourite.delete({ pictureId: id, username: req.params.username });
-    res.status(204).send({ message: "Removed picture from favourites!" });
+    res.status(200).json({ message: "Removed picture from favourites!" });
   } catch (error) {
     console.log(error);
     res.status(500).send("Server error");
@@ -43,10 +43,10 @@ router.get("/ids/:username", async (req, res) => {
     });
 
     if (favouritesById.length === 0) {
-      res.status(200).send({});
+      res.status(200).json({});
       return;
     }
-    res.status(200).send(favouritesById);
+    res.status(200).json(favouritesById);
   } catch (error) {
     console.log(error);
     res.status(500).send("Server error");

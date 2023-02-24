@@ -13,12 +13,10 @@ export default function Favourites() {
     }
   }, []);
 
-  const url = `http://localhost:3000/favourites/pictures/${session.username}`
-
   return session.loggedIn ? (
     <>
       <h1 className="mb-5 font-bold">Your Saved Pictures</h1>
-      <PictureGrid url={url} />
+      <PictureGrid path={`/favourites/pictures/${session.username}`} />
     </>
   ) : (
     <p>Redirecting to login page</p>

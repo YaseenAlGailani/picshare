@@ -4,6 +4,7 @@ import type { IPicture } from "../types";
 import useModal from "../hooks/useModal";
 import { useNavigate } from "react-router-dom";
 import CloseButton from "./CloseButton";
+import { fetcher } from "../utils";
 
 enum actionTypes {
   error = "ERROR",
@@ -58,19 +59,7 @@ export default function PictureModal() {
   const fetchPicture = async () => {
     dispatch({ type: actionTypes.fetching });
     try {
-      const response = await fetch(`http://localhost:3000/pictures/${id}`);
-
-      if (!response.ok) {
-        switch (response.status) {
-          case 400:
-            throw new Error("Bad request");
-          case 404:
-            throw new Error("Not found");
-          default:
-            throw new Error("Unhandled error status");
-        }
-      }
-      const picture = await response.json();
+      const picture = await fetcher(`/pictures/${id}`);
       dispatch({ type: actionTypes.success, picture });
     } catch (error: any) {
       dispatch({ type: actionTypes.error, error });
