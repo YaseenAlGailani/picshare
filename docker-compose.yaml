@@ -1,0 +1,27 @@
+version: "3"
+services:
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: yaseen
+      POSTGRES_PASSWORD: yaseen
+      POSTGRES_DB: picshare
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+  app:
+    build: .
+    restart: always
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: picshare
+      DB_USER: yaseen
+      DB_PASSWORD: yaseen
+    ports:
+      - "3000:3000"
+    command: npm run start
