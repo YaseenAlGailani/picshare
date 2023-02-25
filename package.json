@@ -4,11 +4,10 @@
   "description": "CoTreat Assessment",
   "source": "src/client/index.html",
   "scripts": {
-    "prestart": "npm run build",
     "start": "node dist/server/index.js",
-    "build": "rimraf dist && parcel build && npx tsc",
-    "predev": "rimraf dist && npx tsc",
-    "dev": "concurrently \"npx tsc -w\" \"nodemon ./dist/server/index.js\" \"parcel\""
+    "build": "rimraf dist && parcel build && npx tsc -p src/server/tsconfig.json",
+    "predev": "rimraf dist && npx tsc -p src/server/tsconfig.json",
+    "dev": "concurrently \"npx tsc -w -p src/server/tsconfig.json\" \"nodemon ./dist/server/index.js\" \"parcel\""
   },
   "author": "Yaseen AlGailani",
   "license": "ISC",
