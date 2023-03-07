@@ -8,9 +8,15 @@ module.exports = {
   },
   globals: {
     "ts-jest": {
-      tsconfig: {
-        jsx: "react-jsx",
-      },
+      tsconfig: "./__tests__/tsconfig.json",
     },
+  },
+  transform: {
+    "^.+\\.m?[tj]sx?$": [
+      "ts-jest",
+      {
+        // ts-jest configuration goes here
+      },
+    ],
   },
 };

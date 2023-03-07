@@ -17,7 +17,7 @@ function useLockedBody(initialLocked = false) {
     document.body.style.overflow = "hidden";
  
     // Get the scrollBar width
-    const root = document.getElementById("__next"); // or root
+    const root = document.getElementById("app"); // or root
     const scrollBarWidth = root ? root.offsetWidth - root.scrollWidth : 0;
 
     // Avoid width reflow

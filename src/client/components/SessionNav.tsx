@@ -1,6 +1,6 @@
 import { ReactElement } from "react";
-import { Link, useLocation, useNavigate, NavLink } from "react-router-dom";
-import useQuery from "../hooks/useQuery";
+import { useNavigate, NavLink } from "react-router-dom";
+import { useQuery } from "../hooks/useQuery";
 import useModal from "../hooks/useModal";
 
 interface Props {

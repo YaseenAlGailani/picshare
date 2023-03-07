@@ -1,7 +1,11 @@
 import { useState, useEffect } from "react";
 
-export default function useQuery(query: string, initialState = false) {
+export function useQuery(query: string, initialState = false) {
   const [state, setState] = useState(initialState);
+
+  if(!window.matchMedia){
+    return initialState;
+  }
 
   useEffect(() => {
     let mounted = true;

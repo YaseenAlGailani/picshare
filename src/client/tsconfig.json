@@ -2,15 +2,12 @@
   "compilerOptions": {
     "jsx": "react-jsx",
     "target": "es2015",
-    "lib": ["DOM", "DOM.Iterable", "esnext"],
+    "lib": ["DOM", "esnext"],
     "module": "CommonJS",
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
     "allowJs": true,
     "outDir": "../../dist",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
-    "skipLibCheck": true
   },
 }

@@ -1,7 +1,13 @@
 {
   "compilerOptions": {
     "jsx": "react-jsx",
+    "target": "es2015",
+    "lib": ["DOM", "esnext"],
+    "module": "CommonJS",
+    "allowJs": true,
+    "noEmit": true,
     "esModuleInterop": true,
-    "module": "CommonJS"
-  }
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["./**/*.ts", "./**/*.tsx"]
 }

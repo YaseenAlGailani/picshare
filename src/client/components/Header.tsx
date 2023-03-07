@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useSession } from "../context/SessionContext";
-import Logo from "./Logo";
+import { Logo } from "./Logo";
 import Nav from "./Nav";
 import SessionNav from "./SessionNav";
 
