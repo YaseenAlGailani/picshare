@@ -9,7 +9,7 @@ interface Props {
   path: string;
 }
 
-export default function PictureGrid({ path }: Props) {
+export function PictureGrid({ path }: Props) {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { session } = useSession();
