@@ -1,9 +1,9 @@
 import { useRef } from "react";
 import { Routes, Route } from "react-router-dom";
-import Home from "./components/Home";
-import Login from "./components/Login";
-import Favourites from "./components/Favourites";
-import PageNotFound from "./components/PageNotFound";
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import Favourites from "./pages/Favourites";
+import PageNotFound from "./pages/PageNotFound";
 import Header from "./components/Header";
 import PictureModal from "./components/PictureModal";
 import useModal from "./hooks/useModal";

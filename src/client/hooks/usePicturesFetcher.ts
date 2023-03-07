@@ -1,4 +1,5 @@
 import { useRef, useReducer, useState } from "react";
+import { fetcher } from "../utils";
 import { useSession } from "../context/SessionContext";
 import type { IPicture } from "../types";
 
@@ -73,7 +74,7 @@ function reducer(state: State, action: Action) {
   }
 }
 
-export default function usePictureFetcher(baseUrl: string) {
+export default function usePictureFetcher(path: string) {
   const [isLazyLoading, setIsLazyLoading] = useState(false);
   const { session } = useSession();
   const [state, dispatch] = useReducer(reducer, {
@@ -85,15 +86,11 @@ export default function usePictureFetcher(baseUrl: string) {
   const fetchAll = async () => {
     dispatch({ type: actionTypes.fetching });
     try {
-      const [picResp, idResp] = await Promise.all([
-        fetch(baseUrl),
-        fetch(`http://localhost:3000/favourites/ids/${session.username}`),
+      const [pictureData, favouriteIdsData] = await Promise.all([
+        fetcher(path),
+        fetcher(`/favourites/ids/${session.username}`),
       ]);
 
-      const [pictureData, favouriteIdsData] = await Promise.all([
-        picResp.json(),
-        idResp.json(),
-      ]);
       const favouriteIds = Array.isArray(favouriteIdsData)
         ? extractIds(favouriteIdsData)
         : [];
@@ -103,7 +100,6 @@ export default function usePictureFetcher(baseUrl: string) {
 
       dispatch({ type: actionTypes.setAll, pictureData, favouriteIds });
     } catch (error: any) {
-      console.log(error)
       dispatch({ type: actionTypes.error, error });
     }
   };
@@ -111,24 +107,11 @@ export default function usePictureFetcher(baseUrl: string) {
   const fetchPictures = async () => {
     dispatch({ type: actionTypes.fetching });
     try {
-      const response = await fetch(baseUrl);
-
-      if (!response.ok) {
-        switch (response.status) {
-          case 400:
-            throw new Error("Bad request");
-          case 404:
-            throw new Error("Not found");
-          default:
-            throw new Error("Unhandled error status");
-        }
-      }
-      const pictureData = await response.json();
+      const pictureData = await fetcher(path);
       hasNextRef.current = pictureData.pageInfo.hasNext;
       lastIdRef.current = pictureData.pageInfo.lastId;
       dispatch({ type: actionTypes.setPictures, pictureData });
     } catch (error: any) {
-      console.log(error);
       dispatch({ type: actionTypes.error, error });
     }
   };
@@ -136,10 +119,7 @@ export default function usePictureFetcher(baseUrl: string) {
   const fetchFavouriteIds = async () => {
     dispatch({ type: actionTypes.fetching });
     try {
-      const response = await fetch(
-        `http://localhost:3000/favourites/ids/${session.username}`
-      );
-      const data = await response.json();
+      const data = await fetcher(`/favourites/ids/${session.username}`);
       const favouriteIds = extractIds(data);
       dispatch({ type: actionTypes.setFavouriteIds, favouriteIds });
     } catch (error: any) {
@@ -160,11 +140,10 @@ export default function usePictureFetcher(baseUrl: string) {
 
   const fetchNextPictures = async () => {
     try {
-      const url = new URL(baseUrl);
-      lastIdRef.current &&
-        url.searchParams.set("after", `${lastIdRef.current}`);
-      const response = await fetch(url);
-      const data = await response.json();
+      const url = lastIdRef.current
+        ? `${path}?after=${lastIdRef.current}`
+        : path;
+      const data = await fetcher(url);
       const currentStatePictures = state.pictureData
         ? state.pictureData.pictures
         : [];
@@ -197,7 +176,7 @@ export default function usePictureFetcher(baseUrl: string) {
     fetchNextPictures,
     scrollHandler,
     isLazyLoading,
-    hasNext: hasNextRef.current
+    hasNext: hasNextRef.current,
   };
 }
 

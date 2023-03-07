@@ -1,11 +1,9 @@
 import { useSession } from "../context/SessionContext";
 import { Link } from "react-router-dom";
-import PictureGrid from "./PictureGrid";
+import PictureGrid from "../components/PictureGrid";
 
 export default function Home({ gridKey }: { gridKey:number }) {
   const { session } = useSession();
-
-  const url = "http://localhost:3000/pictures";
 
   return (
     <>
@@ -19,7 +17,7 @@ export default function Home({ gridKey }: { gridKey:number }) {
           </p>
         </div>
       )}
-      <PictureGrid url={url} key={gridKey} />
+      <PictureGrid path='/pictures' key={gridKey} />
     </>
   );
 }

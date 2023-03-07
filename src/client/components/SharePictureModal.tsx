@@ -2,6 +2,7 @@ import { ChangeEvent, useState, FormEvent, FormEventHandler } from "react";
 import CloseButton from "./CloseButton";
 import { useSession } from "../context/SessionContext";
 import { useNavigate } from "react-router-dom";
+import { fetcher } from "../utils";
 
 interface Props {
   refreshGrid: () => void;
@@ -65,22 +66,11 @@ export default function SharePictureModal({
       title,
       date: new Date(),
     };
-
-    try {
-      await fetch("http://localhost:3000/pictures", {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+      await fetcher('/pictures', 'POST', data)
 
       navigate("/");
       refreshGrid();
       closeModal();
-    } catch (error) {
-      console.error(error);
-    }
   };
 
   return (
