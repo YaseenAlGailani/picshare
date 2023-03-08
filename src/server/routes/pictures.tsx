@@ -10,6 +10,7 @@ router.get("/:id", async (req, res) => {
     const picture = await Picture.findOneBy({ id: id });
     if (!picture) {
       res.status(404).send({ message: `Cannot find picture with id:${id}` });
+      return
     }
     res.status(200).send(picture);
   } catch (error) {
@@ -39,8 +40,8 @@ router.post("/", async (req, res) => {
 
 router.get("/", async (req, res) => {
   try {
-    const limit = parseInt(req.query.limit as string) || 12;
-    const after = parseInt(req.query.after as string) || null;
+    const limit = parseInt(req.query?.limit as string) || 12;
+    const after = parseInt(req.query?.after as string) || null;
 
     const [pictures, count] = await Picture.findAndCount({
       ...(after && { where: { id: LessThan(after) } }),

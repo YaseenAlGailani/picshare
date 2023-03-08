@@ -12,31 +12,35 @@ jest.mock("../../../src/client/context/SessionContext", () => ({
   useSession: jest.fn(() => ({ session: { loggedIn: false } })),
 }));
 
-test("Renders login prompt when user is not logged in", () => {
-  const { container } = render(
-    <BrowserRouter>
-      <Home gridKey={1234} />
-    </BrowserRouter>
-  );
-  expect(container).toHaveTextContent(
-    "to start sharing your favourite pictures with others!"
-  );
-});
-
-test("Does not render login prompt when user is logged in", () => {
-  const mockedUseSession = useSession as jest.MockedFunction<typeof useSession>;
-  mockedUseSession.mockReturnValue({
-    session: { loggedIn: true, username: "Yaseen" },
-    login: () => {},
-    logout: () => {},
+describe("Home handles user session", () => {
+  test("Renders login prompt when user is not logged in", () => {
+    const { container } = render(
+      <BrowserRouter>
+        <Home gridKey={1234} />
+      </BrowserRouter>
+    );
+    expect(container).toHaveTextContent(
+      "to start sharing your favourite pictures with others!"
+    );
   });
 
-  const { container } = render(
-    <BrowserRouter>
-      <Home gridKey={1234} />
-    </BrowserRouter>
-  );
-  expect(container).not.toHaveTextContent(
-    "to start sharing your favourite pictures with others!"
-  );
+  test("Does not render login prompt when user is logged in", () => {
+    const mockedUseSession = useSession as jest.MockedFunction<
+      typeof useSession
+    >;
+    mockedUseSession.mockReturnValue({
+      session: { loggedIn: true, username: "Yaseen" },
+      login: () => {},
+      logout: () => {},
+    });
+
+    const { container } = render(
+      <BrowserRouter>
+        <Home gridKey={1234} />
+      </BrowserRouter>
+    );
+    expect(container).not.toHaveTextContent(
+      "to start sharing your favourite pictures with others!"
+    );
+  });
 });
