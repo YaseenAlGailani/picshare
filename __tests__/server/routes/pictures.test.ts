@@ -1,17 +1,9 @@
 import request from "supertest";
 import app from "../../../src/server/app";
 import { Picture } from "../../../src/server/entities/picture.entity";
-
-jest.mock("../../../src/server/app-data-source", () => ({
-  picShareDB: {
-    initialize: jest.fn(async () => {
-      Promise.resolve(true);
-    }),
-  },
-}));
+import { picShareDB } from "../../../src/server/app-data-source";
 
 describe("GET /", () => {
-
   test("Returns a list of pictures and pagination info", async () => {
     Picture.findAndCount = jest.fn().mockResolvedValueOnce([
       [
@@ -57,11 +49,7 @@ describe("GET /", () => {
 });
 
 describe("GET /:id", () => {
-
-  const { picShareDB } = jest.requireActual(
-    "../../../src/server/app-data-source"
-  );
-
+  
   beforeAll(async () => {
     await picShareDB.initialize();
   });
